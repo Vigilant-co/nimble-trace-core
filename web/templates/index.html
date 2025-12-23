@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NimbleTrace | Enterprise Price Monitoring Dashboard</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a0f1e">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="brand">
+                <div class="logo">V</div>
+                <div class="brand-text">
+                    <h1>NimbleTrace</h1>
+                    <div class="tagline">Enterprise Price Intelligence Platform</div>
+                </div>
+            </div>
+            
+            <div class="header-controls">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>All Systems Operational</span>
+                </div>
+                
+                <div class="time-display" id="currentTime">
+                    <!-- Populated by JavaScript -->
+                </div>
+                
+                <button class="btn btn-icon" id="refreshBtn" title="Refresh Data">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- SIDEBAR -->
+        <aside class="dashboard-sidebar">
+            <nav class="nav-section">
+                <div class="nav-title">Monitoring</div>
+                <div class="nav-items">
+                    <a href="#dashboard" class="nav-item active">
+                        <span class="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#products" class="nav-item">
+                        <span class="nav-icon">📦</span>
+                        <span>Products</span>
+                    </a>
+                    <a href="#alerts" class="nav-item">
+                        <span class="nav-icon">🚨</span>
+                        <span>Alerts</span>
+                        <span class="badge badge-danger" style="margin-left: auto;">3</span>
+                    </a>
+                    <a href="#reports" class="nav-item">
+                        <span class="nav-icon">📈</span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <nav class="nav-section">
+                <div class="nav-title">Configuration</div>
+                <div class="nav-items">
+                    <a href="#scrapers" class="nav-item">
+                        <span class="nav-icon">🤖</span>
+                        <span>Scrapers</span>
+                    </a>
+                    <a href="#rules" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        <span>Alert Rules</span>
+                    </a>
+                    <a href="#sites" class="nav-item">
+                        <span class="nav-icon">🌐</span>
+                        <span>Tracked Sites</span>
+                    </a>
+                    <a href="#api" class="nav-item">
+                        <span class="nav-icon">🔌</span>
+                        <span>API Settings</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="nav-section" style="margin-top: auto; border-top: 1px solid var(--border-primary);">
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        <div class="avatar">AD</div>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Admin User</div>
+                        <div class="user-role">System Administrator</div>
+                    </div>
+                    <button class="btn btn-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="dashboard-main">
+            <!-- METRICS GRID -->
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Products Tracked</div>
+                        <div class="metric-trend trend-positive">+2.1%</div>
+                    </div>
+                    <div class="metric-value" id="totalProducts">1,847</div>
+                    <div class="metric-subtext">Across 14 websites</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Active Alerts</div>
+                        <div class="metric-trend trend-negative">+3</div>
+                    </div>
+                    <div class="metric-value" id="activeAlerts">24</div>
+                    <div class="metric-subtext">8 require immediate attention</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Success Rate</div>
+                        <div class="metric-trend trend-positive">+0.3%</div>
+                    </div>
+                    <div class="metric-value" id="successRate">99.2%</div>
+                    <div class="metric-subtext">Last 24 hours</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-label">Avg. Update Interval</div>
+                        <div class="metric-trend trend-positive">-15s</div>
+                    </div>
+                    <div class="metric-value" id="updateInterval">2.4m</div>
+                    <div class="metric-subtext">Per product</div>
+                </div>
+            </section>
+
+            <!-- CHARTS SECTION -->
+            <section class="charts-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Price Trends (24h)</div>
+                        <div class="chart-controls">
+                            <button class="timeframe-btn active" data-interval="1h">1H</button>
+                            <button class="timeframe-btn" data-interval="24h">24H</button>
+                            <button class="timeframe-btn" data-interval="7d">7D</button>
+                            <button class="timeframe-btn" data-interval="30d">30D</button>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Alert Distribution</div>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="alertsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PRODUCTS TABLE -->
+            <section class="products-section">
+                <div class="section-header">
+                    <h2 class="section-title">Tracked Products</h2>
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="M21 21l-4.35-4.35"/>
+                            </svg>
+                            <input type="text" class="search-input" placeholder="Search products..." id="productSearch">
+                        </div>
+                        <select class="filter-select" id="siteFilter">
+                            <option value="">All Sites</option>
+                            <option value="amazon">Amazon</option>
+                            <option value="digikala">Digikala</option>
+                            <option value="ebay">eBay</option>
+                            <option value="aliexpress">AliExpress</option>
+                        </select>
+                        <button class="btn btn-primary" id="addProductBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            Add Product
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="products-table-container">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="name">
+                                    Product <span class="sort-indicator"></span>
+                                </th>
+                                <th class="sortable" data-sort="currentPrice">
+                                    Current Price <span class="sort-indicator"></span>
+                                </th>
+                                <th class="sortable" data-sort="change24h">
+                                    24h Change <span class="sort-indicator"></span>
+                                </th>
+                                <th class="sortable" data-sort="lastUpdated">
+                                    Last Updated <span class="sort-indicator"></span>
+                                </th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="table-footer">
+                    <div class="pagination">
+                        <button class="btn btn-outline" id="prevPage">Previous</button>
+                        <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">42</span></span>
+                        <button class="btn btn-outline" id="nextPage">Next</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-backdrop hidden" id="modalBackdrop"></div>
+    
+    <!-- Add Product Modal -->
+    <div class="modal hidden" id="addProductModal">
+        <div class="modal-header">
+            <h3>Add New Product</h3>
+            <button class="btn btn-icon btn-close" id="closeModalBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label for="productUrl">Product URL</label>
+                    <input type="url" id="productUrl" required placeholder="https://example.com/product">
+                </div>
+                <div class="form-group">
+                    <label for="productName">Product Name</label>
+                    <input type="text" id="productName" required placeholder="Enter product name">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="targetPrice">Target Price ($)</label>
+                        <input type="number" id="targetPrice" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="checkInterval">Check Interval</label>
+                        <select id="checkInterval">
+                            <option value="15">15 minutes</option>
+                            <option value="30" selected>30 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="360">6 hours</option>
+                            <option value="1440">24 hours</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelBtn">Cancel</button>
+            <button class="btn btn-primary" id="saveProductBtn">Start Tracking</button>
+        </div>
+    </div>
+
+    <!-- Alert Details Modal -->
+    <div class="modal hidden" id="alertDetailsModal">
+        <!-- Populated dynamically -->
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="/static/js/api-client.js"></script>
+    <script src="/static/js/chart-manager.js"></script>
+    <script src="/static/js/app.js"></script>
+    
+    <script>
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            window.nimbleTrace.init();
+        });
+    </script>
+</body>
+</html>
